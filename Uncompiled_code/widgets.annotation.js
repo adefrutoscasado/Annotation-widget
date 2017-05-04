@@ -6,7 +6,7 @@ import WidgetsHandle from '../widgets/widgets.handle';
  *
  */
 
-export default class WidgetsRuler extends WidgetsBase {
+export default class WidgetsAnnotation extends WidgetsBase {
 
   constructor(targetMesh, controls, camera, container) {
     super();
@@ -102,12 +102,13 @@ export default class WidgetsRuler extends WidgetsBase {
     if (this._labelhovered = true){ //if label hobered we will move the label
         this._movinglabel = true;
         this._labelmoved = true;
-        let mousey =  - (-event.clientY + window.innerHeight);
+        let mousey =  - (-event.clientY + this._container.offsetHeight);
         let mousex = event.clientX;
         //calculate differencemousecenterlabel (difference between ref position of the label (top-left corner) and mouse position in the label)
         this._differencemousecenterlabelx = Math.abs(Math.abs(mousex) - Math.abs(this._labelpositionx));
         this._differencemousecenterlabely = Math.abs(Math.abs(mousey) - Math.abs(this._labelpositiony));
-
+        //this._differencemousecenterlabelx = 0;
+        //this._differencemousecenterlabely = 0;
     }
   }
 
@@ -206,7 +207,7 @@ export default class WidgetsRuler extends WidgetsBase {
       self._alreadycreated = true;
     }
 
-    // State of ruler widget
+    // State of annotation widget
     this._active = this._handles[0].active || this._handles[1].active;
     this.update();
 
@@ -314,7 +315,7 @@ export default class WidgetsRuler extends WidgetsBase {
   updateDOMPosition() {
 
     console.log('function updateDOMPosition');
-    // update rulers lines and text!
+    // update annotation lines and text!
     let x1 = this._handles[0].screenPosition.x;
     let y1 = this._handles[0].screenPosition.y;
     let x2 = this._handles[1].screenPosition.x;
@@ -355,10 +356,10 @@ export default class WidgetsRuler extends WidgetsBase {
         this._labelpositiony = Math.round(posY0);
     }
 
+
     if (this._movinglabel) { //if the user has moved the label, the position is defined by the mouse
         mousex = event.clientX;
-        mousey =  -(-event.clientY + window.innerHeight);
-        this._label.style.transform = `translate3D(${mousex}px,${mousey}px, 0)`;
+        mousey =  -(-event.clientY + this._container.offsetHeight);
         this._label.style.transform = `translate3D(${mousex - this._differencemousecenterlabelx}px,${mousey - this._differencemousecenterlabely}px, 0)`; 
         //we use differencemousecenterlabel to check the difference between the position of the mouse in the label and the reference position of the label (top-left corner)
         this._labelpositionx = mousex - this._differencemousecenterlabelx;
@@ -389,7 +390,7 @@ export default class WidgetsRuler extends WidgetsBase {
     x1 = this._handles[0].screenPosition.x;
     y1 = this._handles[0].screenPosition.y;
     x2 = this._labelpositionx;
-    y2 = this._labelpositiony + window.innerHeight; //revert the operation in 'mousey' to get the previous eventY
+    y2 = this._labelpositiony + this._container.offsetHeight; //revert the operation in 'mousey' to get the previous eventY
 
     var elem = document.getElementById(this._label.id); //get the label element to check the size, so we can point the dashed line to the center of the label
     var labelheight = window.getComputedStyle(elem, null).getPropertyValue("block-size"); //get the label height from the computed style
@@ -409,7 +410,6 @@ export default class WidgetsRuler extends WidgetsBase {
     y2 += centerlabely;
 
     //calculate the place in the arrow: closest part of the line to place the dashed line
-
     var x1_tail = this._handles[0].screenPosition.x; //first position: tail of arrow
     var y1_tail = this._handles[0].screenPosition.y;
     var x1_body = (this._handles[0].screenPosition.x + this._handles[1].screenPosition.x)/2; //second position: center of arrow
